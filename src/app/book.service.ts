@@ -1,17 +1,18 @@
 import { ComponentFactoryResolver, Injectable } from '@angular/core';
 import { Book } from './book'
-
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
+import { catchError, map, tap } from 'rxjs/operators'
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookService {
 
+  private dataUri = 'http://localhost:3000/books'
+  constructor(private http: HttpClient) { }
 
-  constructor() { }
-
-  private dummyBooksData : Book[] = [{"tags":[],"_id":"61643ac437689140c4239e5f",
+  /*private dummyBooksData : Book[] = [{"tags":[],"_id":"61643ac437689140c4239e5f",
   "title":"Huckleberry Finn","author":{"name":"Twain, Mark","nationality":"American"},
   "year_written":1865,"edition":"Penguin","price":5.76},{"tags":[],
   "_id":"61643ac437689140c4239e61","title":"Tom Sawyer",
@@ -27,14 +28,55 @@ export class BookService {
   "_id":"61643ac437689140c4239e5b","title":"War and Peace",
   "author":{"name":"Tolstoy, Leo","nationality":"Russian"},
   "year_written":1865,"edition":"Penguin","price":12.7}]
-
+  */
 
   getBooks(): Observable<Book[]>{
-    console.log('Dummy getBooks called');
+    console.log('getBooks called');
 
-    return of(this.dummyBooksData);
+    return this.http.get<Book[]>(`${this.dataUri}?limit=5`)
+      .pipe(
+        catchError(this.handleError)
+      )
   }
 
-  //taken from: https://angular.io/guide/http
+  addBook(book: Book): Observable<Book> {
+    return this.http.post<Book>(this.dataUri, book)
+      .pipe(
+        catchError(this.handleError)
+      )
+  }
+
+  updateBook(id: string, book: Book): Observable<Book> {
+    console.log('subscribing to update' + id);
+    let bookURI: string = this.dataUri + '/' + id;
+    return this.http.put<Book>(bookURI, book)
+      .pipe(
+        catchError(this.handleError)
+      )
+  }
+
+  deleteBook(id: string): Observable<unknown> {
+    const url = `${this.dataUri}/${id}`; // DELETE 
+    return this.http.delete(url)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+  
+  private handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error.message);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong.
+      console.error(
+        `Backend returned code ${error.status}, ` +
+        `body was: ${error.error}`);
+    }
+    // Return an observable with a user-facing error message.
+    return throwError(
+      'Something bad happened; please try again later.');
+  }
 
 }
