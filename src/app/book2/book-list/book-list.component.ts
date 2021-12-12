@@ -18,7 +18,6 @@ export class BookListComponent implements OnInit {
   constructor(private bookService: BookService) { }
 
   ngOnInit(): void {
-
     this.bookService.getBooks().subscribe({
       next: (value: Book[] )=> this.bookList = value,
       complete: () => console.log("book service finished"),

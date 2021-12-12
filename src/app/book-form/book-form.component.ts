@@ -17,7 +17,6 @@ export class BookFormComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-
     this.bookForm = new FormGroup({
       title: new FormControl(this.book?.title, [Validators.required, Validators.minLength(3)]),
       year_written: new FormControl(this.book?.year_written, [Validators.required, Validators.max(2024)])

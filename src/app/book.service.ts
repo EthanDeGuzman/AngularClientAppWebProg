@@ -9,7 +9,7 @@ import { catchError, map, tap } from 'rxjs/operators'
 })
 export class BookService {
 
-  private dataUri = 'http://localhost:3000/books'
+  private dataUri = 'https://localhost:3000/books'
   constructor(private http: HttpClient) { }
 
   /*private dummyBooksData : Book[] = [{"tags":[],"_id":"61643ac437689140c4239e5f",
